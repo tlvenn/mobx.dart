@@ -9,6 +9,7 @@ import 'package:mobx/src/api/annotations.dart'
 import 'package:mobx_codegen/src/errors.dart';
 import 'package:mobx_codegen/src/template/action.dart';
 import 'package:mobx_codegen/src/template/async_action.dart';
+import 'package:mobx_codegen/src/template/tracked_action.dart';
 import 'package:mobx_codegen/src/template/computed.dart';
 import 'package:mobx_codegen/src/template/method_override.dart';
 import 'package:mobx_codegen/src/template/observable.dart';
@@ -135,6 +136,13 @@ class StoreClassVisitor extends SimpleElementVisitor {
       ?.getField('keepAlive')
       ?.toBoolValue();
 
+  bool _isActionTracked(MethodElement element) =>
+      _actionChecker
+          .firstAnnotationOfExact(element)
+          ?.getField('tracked')
+          ?.toBoolValue() ??
+      false;
+
   @override
   void visitPropertyAccessorElement(PropertyAccessorElement element) {
     if (element.isSetter && element.isPublic) {
@@ -180,14 +188,25 @@ class StoreClassVisitor extends SimpleElementVisitor {
       }
 
       if (element.isAsynchronous) {
-        final template = AsyncActionTemplate(
-          storeTemplate: _storeTemplate,
-          isObservable: _observableChecker.hasAnnotationOfExact(element),
-          method: MethodOverrideTemplate.fromElement(element, typeNameFinder),
-          hasProtected: element.hasProtected,
-          hasVisibleForOverriding: element.hasVisibleForOverriding,
-          hasVisibleForTesting: element.hasVisibleForTesting,
-        );
+        final template = (_isActionTracked(element) ||
+                true) // Forcing tracked for now
+            ? TrackedActionTemplate(
+                storeTemplate: _storeTemplate,
+                method:
+                    MethodOverrideTemplate.fromElement(element, typeNameFinder),
+                hasProtected: element.hasProtected,
+                hasVisibleForOverriding: element.hasVisibleForOverriding,
+                hasVisibleForTesting: element.hasVisibleForTesting,
+              )
+            : AsyncActionTemplate(
+                storeTemplate: _storeTemplate,
+                isObservable: _observableChecker.hasAnnotationOfExact(element),
+                method:
+                    MethodOverrideTemplate.fromElement(element, typeNameFinder),
+                hasProtected: element.hasProtected,
+                hasVisibleForOverriding: element.hasVisibleForOverriding,
+                hasVisibleForTesting: element.hasVisibleForTesting,
+              );
 
         _storeTemplate.asyncActions.add(template);
       } else {
