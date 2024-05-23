@@ -433,10 +433,12 @@ class ConstStatefulObserver extends StatefulObserverWidget {
   const ConstStatefulObserver({super.key});
 
   @override
-  State<ConstStatefulObserver> createState() => _ConstStatefulObserverState();
+  StatefulObserverState<ConstStatefulObserver> createState() =>
+      _ConstStatefulObserverState();
 }
 
-class _ConstStatefulObserverState extends State<ConstStatefulObserver> {
+class _ConstStatefulObserverState
+    extends StatefulObserverState<ConstStatefulObserver> {
   @override
   Widget build(BuildContext context) => Container();
 }

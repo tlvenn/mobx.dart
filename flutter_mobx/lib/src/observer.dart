@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_mobx/src/observer_widget_mixin.dart';
 import 'package:flutter_mobx/src/stateless_observer_widget.dart';
 
 /// `true` if a stack frame indicating where an [Observer] was created should be
@@ -21,9 +22,10 @@ class Observer extends StatelessObserverWidget {
   Observer({
     super.key,
     required this.builder,
-    super.name,
-    super.warnWhenNoObservables,
-  }) : debugConstructingStackFrame = debugFindConstructingStackFrame();
+    ReactionCallback? onReaction,
+    String? name,
+    bool? warnWhenNoObservables,
+  })  : debugConstructingStackFrame = debugFindConstructingStackFrame();
 
   /// Observer which excludes the child branch from being rebuilt
   ///

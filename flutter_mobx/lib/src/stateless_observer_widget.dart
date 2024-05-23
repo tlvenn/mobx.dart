@@ -17,20 +17,28 @@ abstract class StatelessObserverWidget extends StatelessWidget
     super.key,
     ReactiveContext? context,
     String? name,
+    ReactionCallback? onReaction,
     this.warnWhenNoObservables,
   })  : _name = name,
-        _context = context;
+        _context = context,
+        _reactionCallback = onReaction,
+        super(key: key);
 
   final String? _name;
   final ReactiveContext? _context;
   @override
   final bool? warnWhenNoObservables;
 
+  final ReactionCallback? _reactionCallback;
+
   @override
   String getName() => _name ?? '$this';
 
   @override
   ReactiveContext getContext() => _context ?? super.getContext();
+
+  @override
+  ReactionCallback? getReactionCallback() => _reactionCallback;
 
   @override
   StatelessObserverElement createElement() => StatelessObserverElement(this);
