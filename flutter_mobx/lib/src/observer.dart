@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_mobx/src/observer_widget_mixin.dart';
 import 'package:flutter_mobx/src/stateless_observer_widget.dart';
 
 /// `true` if a stack frame indicating where an [Observer] was created should be
@@ -21,6 +22,7 @@ class Observer extends StatelessObserverWidget {
   Observer({
     Key? key,
     required this.builder,
+    ReactionCallback? onReaction,
     String? name,
     bool? warnWhenNoObservables,
   })  : debugConstructingStackFrame = debugFindConstructingStackFrame(),
@@ -30,6 +32,7 @@ class Observer extends StatelessObserverWidget {
         super(
           key: key,
           name: name,
+          onReaction: onReaction,
           warnWhenNoObservables: warnWhenNoObservables,
         );
 
@@ -64,13 +67,14 @@ class Observer extends StatelessObserverWidget {
 
   @override
   String getName() =>
-    super.getName() + 
-    (debugConstructingStackFrame != null
-      ? '\n$debugConstructingStackFrame'
-      : '');
+      super.getName() +
+      (debugConstructingStackFrame != null
+          ? '\n$debugConstructingStackFrame'
+          : '');
 
   @override
-  Widget build(BuildContext context) => builderWithChild?.call(context, child) ?? builder!.call(context);
+  Widget build(BuildContext context) =>
+      builderWithChild?.call(context, child) ?? builder!.call(context);
 
   /// Matches constructor stack frames, in both VM and web environments.
   static final _constructorStackFramePattern = RegExp(r'\bnew\b');
@@ -99,15 +103,14 @@ class Observer extends StatelessObserverWidget {
             .skip(3)
             // Search for the first non-constructor frame
             .firstWhere(
-              (frame) => 
-                !_constructorStackFramePattern.hasMatch(frame),
+                (frame) => !_constructorStackFramePattern.hasMatch(frame),
                 orElse: () => '');
 
         final stackFrameCore =
-          _stackFrameCleanUpPattern.firstMatch(rawStackFrame)?.group(1);
+            _stackFrameCleanUpPattern.firstMatch(rawStackFrame)?.group(1);
         final cleanedStackFrame = stackFrameCore == null
-          ? null
-          : 'Observer constructed from: $stackFrameCore';
+            ? null
+            : 'Observer constructed from: $stackFrameCore';
 
         stackFrame = cleanedStackFrame;
       }

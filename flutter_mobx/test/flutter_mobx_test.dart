@@ -59,45 +59,49 @@ void main() {
     expect(renderCount, equals(1));
   });
 
-  testWidgets("Observer.withBuiltChild's child doesn't re-render", (tester) async {
+  testWidgets("Observer.withBuiltChild's child doesn't re-render",
+      (tester) async {
     final message = Observable('Click');
-     final key1 = UniqueKey();
-     final key2 = UniqueKey();
-     final key3 = UniqueKey();
+    final key1 = UniqueKey();
+    final key2 = UniqueKey();
+    final key3 = UniqueKey();
 
-     await tester.pumpWidget(
-       MaterialApp(
-         home: Observer.withBuiltChild(
-           builderWithChild: (context, child) {          
-             return Column(
-               children: [
-                 ElevatedButton(onPressed: () => message.value = 'Clicked', child: Container()),
-                 Text(message.value, key: key1),
-                 child!,
-                 Builder(
-                   builder: (context) {
-                     return Text(message.value, key: key3); 
-                   }
-                 ),
-               ],
-             );
-           },
-           child: Text(message.value, key: key2),
-         ),
-       ),
-     );    
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Observer.withBuiltChild(
+          builderWithChild: (context, child) {
+            return Column(
+              children: [
+                ElevatedButton(
+                    onPressed: () => message.value = 'Clicked',
+                    child: Container()),
+                Text(message.value, key: key1),
+                child!,
+                Builder(builder: (context) {
+                  return Text(message.value, key: key3);
+                }),
+              ],
+            );
+          },
+          child: Text(message.value, key: key2),
+        ),
+      ),
+    );
 
-     expect(tester.widget<Text>(find.byKey(key1)).data, equals('Click'));
-     expect(tester.widget<Text>(find.byKey(key2)).data, equals('Click'));
-     expect(tester.widget<Text>(find.byKey(key3)).data, equals('Click'));
+    expect(tester.widget<Text>(find.byKey(key1)).data, equals('Click'));
+    expect(tester.widget<Text>(find.byKey(key2)).data, equals('Click'));
+    expect(tester.widget<Text>(find.byKey(key3)).data, equals('Click'));
 
-     await tester.tap(find.byType(ElevatedButton));
-     expect(message.value, equals('Clicked'));
+    await tester.tap(find.byType(ElevatedButton));
+    expect(message.value, equals('Clicked'));
 
-     await tester.pump();
-     expect(tester.widget<Text>(find.byKey(key1)).data, equals('Clicked')); // Observer rebuilt the Text1
-     expect(tester.widget<Text>(find.byKey(key2)).data, equals('Click')); // child Text2 did not change
-     expect(tester.widget<Text>(find.byKey(key3)).data, equals('Clicked')); // Builder does not preserve from rebuild
+    await tester.pump();
+    expect(tester.widget<Text>(find.byKey(key1)).data,
+        equals('Clicked')); // Observer rebuilt the Text1
+    expect(tester.widget<Text>(find.byKey(key2)).data,
+        equals('Click')); // child Text2 did not change
+    expect(tester.widget<Text>(find.byKey(key3)).data,
+        equals('Clicked')); // Builder does not preserve from rebuild
   });
 
   testWidgets('Observer build should call reaction.track', (tester) async {
@@ -374,10 +378,12 @@ class ConstStatefulObserver extends StatefulObserverWidget {
   const ConstStatefulObserver({Key? key}) : super(key: key);
 
   @override
-  State<ConstStatefulObserver> createState() => _ConstStatefulObserverState();
+  StatefulObserverState<ConstStatefulObserver> createState() =>
+      _ConstStatefulObserverState();
 }
 
-class _ConstStatefulObserverState extends State<ConstStatefulObserver> {
+class _ConstStatefulObserverState
+    extends StatefulObserverState<ConstStatefulObserver> {
   @override
   Widget build(BuildContext context) => Container();
 }

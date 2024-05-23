@@ -7,6 +7,8 @@ import 'package:mobx/src/core.dart' show ReactionImpl;
 /// Whether to warn when there is no observables in the builder function
 bool enableWarnWhenNoObservables = true;
 
+typedef ReactionCallback = void Function();
+
 /// Observer observes the observables used in the `build` method and rebuilds
 /// the Widget whenever any of them change. There is no need to do any other
 /// wiring besides simply referencing the required observables.
@@ -24,6 +26,9 @@ mixin ObserverWidgetMixin on Widget {
   /// The context within which its reaction should be run. It is the
   /// [mainContext] in most cases.
   ReactiveContext getContext() => mainContext;
+
+  /// A callback to be called when the reaction triggers
+  ReactionCallback? getReactionCallback();
 
   /// A convenience method used for testing.
   @visibleForTesting
@@ -108,6 +113,10 @@ mixin ObserverElementMixin on ComponentElement {
     }
 
     markNeedsBuild();
+
+    if (_widget.getReactionCallback() != null) {
+      _widget.getReactionCallback()!.call();
+    }
   }
 
   @override

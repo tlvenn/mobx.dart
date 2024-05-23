@@ -14,13 +14,18 @@ abstract class StatefulObserverWidget extends StatefulWidget
     with ObserverWidgetMixin {
   /// Initializes [key], [context] and [name] for subclasses.
   const StatefulObserverWidget(
-      {Key? key, ReactiveContext? context, String? name})
+      {Key? key,
+      ReactiveContext? context,
+      String? name,
+      ReactionCallback? onReaction})
       : _name = name,
         _context = context,
+        _reactionCallback = onReaction,
         super(key: key);
 
   final String? _name;
   final ReactiveContext? _context;
+  final ReactionCallback? _reactionCallback;
 
   @override
   String getName() => _name ?? '$this';
@@ -29,7 +34,18 @@ abstract class StatefulObserverWidget extends StatefulWidget
   ReactiveContext getContext() => _context ?? super.getContext();
 
   @override
+  ReactionCallback? getReactionCallback() => _reactionCallback;
+
+  @override
   StatefulObserverElement createElement() => StatefulObserverElement(this);
+
+  @override
+  StatefulObserverState createState();
+}
+
+abstract class StatefulObserverState<T extends StatefulObserverWidget>
+    extends State<T> {
+  void onInvalidate() {}
 }
 
 /// An [Element] that uses a [StatefulObserverWidget] as its configuration.
