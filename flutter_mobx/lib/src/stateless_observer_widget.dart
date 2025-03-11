@@ -21,8 +21,7 @@ abstract class StatelessObserverWidget extends StatelessWidget
     this.warnWhenNoObservables,
   })  : _name = name,
         _context = context,
-        _reactionCallback = onReaction,
-        super(key: key);
+        _reactionCallback = onReaction;
 
   final String? _name;
   final ReactiveContext? _context;
