@@ -4,6 +4,8 @@ import 'package:mobx/mobx.dart';
 // ignore: implementation_imports
 import 'package:mobx/src/core.dart' show ReactionImpl;
 
+import 'stateful_observer_widget.dart';
+
 /// Whether to warn when there is no observables in the builder function
 bool enableWarnWhenNoObservables = true;
 
@@ -110,6 +112,11 @@ mixin ObserverElementMixin on ComponentElement {
 
       // If it is disposed after this frame, we should no longer call `markNeedsBuild`
       if (_reaction == null) return;
+    }
+
+    if (this is StatefulObserverElement) {
+      ((this as StatefulObserverElement).state as StatefulObserverState)
+          .onInvalidate();
     }
 
     markNeedsBuild();
